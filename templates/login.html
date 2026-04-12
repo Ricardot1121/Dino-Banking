@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- Tells the browser this is an HTML5 document -->
+
+<html>
+    <head>
+        <!-- Head contains page info not visible to users -->
+        <title>Login</title>
+        <!-- Title shows in the browser tab -->
+    </head>
+    <body>
+        <!-- Body contains everything users actually see -->
+
+        <h1>Welcome to Dino Banking</h1>
+        <!-- h1 is the biggest heading on the page -->
+
+        <form action="/login" method="POST">
+        <!-- form sends user data to the /login route in Flask -->
+        <!-- method="POST" sends data securely, not visible in URL -->
+
+            <label for="username">Username:</label>
+            <!-- label tells the user what to type in -->
+            
+            <input type="text" id="username" name="username"><br><br>
+            <!-- input creates the text box -->
+            <!-- name="username" is how Flask reads this value -->
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password"><br><br>
+            <!-- type="password" hides the characters as you type -->
+
+            <input type="submit" value="Login">
+            <!-- Creates the Login button -->
+            
+        </form>
+    </body>
+</html>
