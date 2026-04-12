@@ -25,6 +25,21 @@ def login():
         return 'Login successful!'
     return render_template('login.html')
 
+# Register Route
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # Get what user typed
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        username = request.form['username']
+        password = request.form['password']
+        # Checking everything works
+        print(f"First Name: {first_name}, Last Name: {last_name}, Username: {username}, Password: {password}")
+        return 'Registration successful!'
+    return render_template('register.html')
+
+
 # This ALWAYS goes last - runs the application
 if __name__ == '__main__':
     app.run(debug=True)
