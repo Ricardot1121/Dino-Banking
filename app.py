@@ -34,6 +34,7 @@ class User(db.Model):
     routing_number = db.Column(db.String(9), default='031000053')
     checking_balance = db.Column(db.Float, default=0.0)
     savings_balance = db.Column(db.Float, default=0.0)
+    is_admin = db.Column(db.Boolean, default=False)
 
 # Homepage redirects to login
 @app.route('/')
@@ -55,8 +56,12 @@ def login():
         if user and bcrypt.check_password_hash(user.password, password):
             # Password matched! Save user id in session so we remember who is logged in
             session['user_id'] = user.id
-            # Redirect to dashboard - no need to pass user_id in URL anymore, session handles it
-            return redirect(url_for('dashboard'))
+            # Check if user is admin and redirect accordingly
+            if user.is_admin:
+                return redirect(url_for('admin'))
+            else:
+                # Redirect to dashboard - no need to pass user_id in URL anymore, session handles it
+                return redirect(url_for('dashboard'))
         else:
             return 'Invalid username or password'
             
@@ -87,7 +92,7 @@ def register():
             account_number=account_number
         )
 
-        # Save to database
+        # Save to database user
         db.session.add(new_user)
         db.session.commit()
 
@@ -115,6 +120,23 @@ def logout():
     # Clear the session to log the user out
     session.clear()
     return redirect(url_for('login'))
+
+# this will be a route for the admin dashboard - only accessible to users with is_admin=True
+@app.route('/admin')
+def admin():
+    # Check if user is logged in and is an admin
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    
+    if not user.is_admin:
+        return 'Access denied: Admins only'
+    
+    # Get all users to display in admin dashboard
+    users = User.query.all()
+    
+    return render_template('admin.html', user=user, users=users)
 
 # This ALWAYS goes last - runs the application
 if __name__ == '__main__':
