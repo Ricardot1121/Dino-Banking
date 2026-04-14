@@ -3,10 +3,12 @@
 # ================================
 
 # Import Flask and tools we need
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import random
+
+
 
 # Create our Flask application
 app = Flask(__name__)
@@ -51,7 +53,10 @@ def login():
         
         # Check if user exists and password matches
         if user and bcrypt.check_password_hash(user.password, password):
-            return 'Login successful!'
+            # Password matched! Save user id in session so we remember who is logged in
+            session['user_id'] = user.id
+            # Redirect to dashboard - no need to pass user_id in URL anymore, session handles it
+            return redirect(url_for('dashboard'))
         else:
             return 'Invalid username or password'
             
@@ -90,6 +95,20 @@ def register():
 
     return render_template('register.html')
 
+# This will go to dashboard once user is logged in
+@app.route('/dashboard')
+def dashboard():
+    # Check if user is logged in by looking for user_id in session
+    # If not found, send them back to login page
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Get the full user object from database using the session user_id
+    user = User.query.get(session['user_id'])
+    
+    # Send user data to dashboard template
+    return render_template('dashboard.html', user=user)
+    
 
 # This ALWAYS goes last - runs the application
 if __name__ == '__main__':

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dashboard</title>
+    </head>
+    <body>
+        <!-- Personalized greeting using user's first name from database -->
+        <h1>Welcome, {{ user.first_name }}! 🦕</h1>
+        
+        <!-- User account information section -->
+        <!-- {{ user.first_name }} pulls the value directly from the User object we passed from Flask -->
+        <p><strong>Account Holder:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        
+        <!-- Account number generated randomly when user registered -->
+        <p><strong>Account Number:</strong> {{ user.account_number }}</p>
+        
+        <!-- Balance section -->
+        <!-- These values come from the database - currently 0.0 until admin deposits money -->
+        <h2>Your Balances</h2>
+        <p><strong>Checking Balance:</strong> ${{ user.checking_balance }}</p>
+        <p><strong>Savings Balance:</strong> ${{ user.savings_balance }}</p>
+    </body>
+</html>
