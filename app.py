@@ -108,7 +108,13 @@ def dashboard():
     
     # Send user data to dashboard template
     return render_template('dashboard.html', user=user)
-    
+
+# Here is where the user can log out - we will clear the session to log them out.
+@app.route('/logout', methods=['POST'])
+def logout():
+    # Clear the session to log the user out
+    session.clear()
+    return redirect(url_for('login'))
 
 # This ALWAYS goes last - runs the application
 if __name__ == '__main__':
