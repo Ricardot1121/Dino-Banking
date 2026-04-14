@@ -6,10 +6,37 @@
 <body>
     <h1>Welcome, Admin {{ user.first_name }}</h1>
     <h2>All Users</h2>
-    <ul>
+    <table border="1">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Account Number</th>
+            <th>Checking Balance</th>
+            <th>Savings Balance</th>
+        </tr>
         {% for u in users %}
-            <li>{{ u.first_name }} {{ u.last_name }} - {{ u.username }}</li>
+        <tr>
+            <td>{{ u.first_name }}</td>
+            <td>{{ u.last_name }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.account_number }}</td>
+            <td>${{ '%.2f'|format(u.checking_balance) }}</td>
+            <td>${{ '%.2f'|format(u.savings_balance) }}</td>
+            <!-- Action buttons for each user -->
+            <td>
+                <button>View</button>
+                <button>Edit</button>
+                <a href="{{ url_for('admin_deposit', user_id=u.id) }}">
+                <button>Deposit</button>
+                </a>
+                <button>Delete</button>
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
+    <form action="{{ url_for('logout') }}" method="POST">
+            <input type="submit" value="Logout">
+    </form>
 </body>
 </html>

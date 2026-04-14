@@ -133,10 +133,46 @@ def admin():
     if not user.is_admin:
         return 'Access denied: Admins only'
     
-    # Get all users to display in admin dashboard
-    users = User.query.all()
+    # Only show non-admin users in the table
+    users = User.query.filter_by(is_admin=False).all()
     
     return render_template('admin.html', user=user, users=users)
+
+# Admin route to Deposit to users accounts - only accessible to admins
+@app.route('/admin/deposit/<int:user_id>', methods=['GET', 'POST'])
+def admin_deposit(user_id):
+    # Check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Get admin user and verify they have admin access
+    admin_user = User.query.get(session['user_id'])
+    if not admin_user.is_admin:
+        return 'Access denied: Admins only'
+    
+    # Get the user we want to deposit to using their id from the URL
+    user = User.query.get(user_id)
+
+    # Only process deposit when form is submitted
+    if request.method == 'POST':
+        # Get form data submitted by admin
+        account_type = request.form['account_type']
+        amount = float(request.form['amount'])
+    
+        # Add amount to correct account type
+        if account_type == 'checking':
+            user.checking_balance += amount
+        elif account_type == 'savings':
+            user.savings_balance += amount
+    
+        # Save changes to database
+        db.session.commit()
+        
+        # Return to admin dashboard after deposit
+        return redirect(url_for('admin'))
+
+    # Show deposit form for GET requests
+    return render_template('deposit.html', user=user)
 
 # This ALWAYS goes last - runs the application
 if __name__ == '__main__':
