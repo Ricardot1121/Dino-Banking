@@ -221,6 +221,32 @@ def edit_user(user_id):
     # Show edit form for GET requests
     return render_template('edit_user.html', user=user)
 
+# This will be a route for the admin to delete a user - only accessible to admins
+@app.route('/admin/delete/<int:user_id>', methods=['GET', 'POST'])
+def delete_user(user_id):
+    # Check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Get admin user and verify they have admin access
+    admin_user = User.query.get(session['user_id'])
+    if not admin_user.is_admin:
+        return 'Access denied: Admins only'
+    
+    # Get the user we want to delete using their id from the URL
+    user = User.query.get(user_id)
+
+    if request.method == 'POST':
+        # Delete the user from the database
+        db.session.delete(user)
+        db.session.commit()
+        
+        # Return to admin dashboard after deletion
+        return redirect(url_for('admin'))
+
+    # Show confirmation page for GET requests
+    return render_template('delete_user.html', user=user)
+
 # This ALWAYS goes last - runs the application
 if __name__ == '__main__':
     # Create database tables if they don't exist
