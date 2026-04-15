@@ -174,6 +174,53 @@ def admin_deposit(user_id):
     # Show deposit form for GET requests
     return render_template('deposit.html', user=user)
 
+# Allow admin to view user details - only accessible to admins
+@app.route('/admin/view/<int:user_id>')
+def view_user(user_id):
+    # Check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Get admin user and verify they have admin access
+    admin_user = User.query.get(session['user_id'])
+    if not admin_user.is_admin:
+        return 'Access denied: Admins only'
+    
+    # Get the user we want to view using their id from the URL
+    user = User.query.get(user_id)
+    
+    return render_template('view_user.html', user=user)
+
+# Allow admin to edit user details - only accessible to admins
+@app.route('/admin/edit/<int:user_id>', methods=['GET', 'POST'])
+def edit_user(user_id):
+    # Check if user is logged in
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Get admin user and verify they have admin access
+    admin_user = User.query.get(session['user_id'])
+    if not admin_user.is_admin:
+        return 'Access denied: Admins only'
+    
+    # Get the user we want to edit using their id from the URL
+    user = User.query.get(user_id)
+
+    if request.method == 'POST':
+        # Get form data submitted by admin
+        user.first_name = request.form['first_name']
+        user.last_name = request.form['last_name']
+        user.username = request.form['username']
+        
+        # Save changes to database
+        db.session.commit()
+        
+        # Return to admin dashboard after editing
+        return redirect(url_for('admin'))
+
+    # Show edit form for GET requests
+    return render_template('edit_user.html', user=user)
+
 # This ALWAYS goes last - runs the application
 if __name__ == '__main__':
     # Create database tables if they don't exist
